@@ -1,0 +1,6 @@
+services:
+  multi-agent-ops:
+    build: .
+    env_file:
+      - .env
+    command: python -m multi_agent_ops.cli --task-file examples/example_task.yaml
