@@ -6,27 +6,26 @@ services:
     env_file:
       - .env
     environment:
-      - LOG_LEVEL=INFO
+      - LOG_LEVEL=WARNING
+      - MAX_RETRIES=5
     command: python -m multi_agent_ops.cli --task-file examples/example_task.yaml
     volumes:
       - ./output:/app/output
-    ports:
-      - "8000:8000"
-    healthcheck:
-      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 5s
-    restart: unless-stopped
+    restart: always
     deploy:
       resources:
         limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
           cpus: '1.0'
           memory: 512M
-        reservations:
-          cpus: '0.5'
-          memory: 256M
+      replicas: 2
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
 
   api:
     build:
@@ -35,7 +34,8 @@ services:
     env_file:
       - .env
     environment:
-      - LOG_LEVEL=INFO
+      - LOG_LEVEL=WARNING
+      - MAX_RETRIES=5
     command: python -c "from multi_agent_ops.api import start_api; start_api()"
     ports:
       - "8000:8000"
@@ -45,12 +45,39 @@ services:
       timeout: 10s
       retries: 3
       start_period: 5s
-    restart: unless-stopped
+    restart: always
     deploy:
       resources:
         limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
           cpus: '1.0'
           memory: 512M
-        reservations:
+      replicas: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+    deploy:
+      resources:
+        limits:
           cpus: '0.5'
           memory: 256M
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  redis_data:

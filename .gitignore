@@ -5,3 +5,12 @@ __pycache__/
 dist/
 build/
 *.zip
+*.egg-info/
+.eggs/
+*.log
+output/
+htmlcov/
+coverage.xml
+.coverage
+.mypy_cache/
+.ruff_cache/

@@ -4,6 +4,42 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "multi-agent-ops-system"
-version = "0.1.0"
+version = "0.2.0"
 description = "Multi-agent operations automation system MVP"
 requires-python = ">=3.10"
+dependencies = [
+    "openai>=1.40.0",
+    "PyYAML>=6.0.1",
+    "python-dotenv>=1.0.1",
+    "pydantic>=2.8.2",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "httpx>=0.28.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.2",
+    "pytest-asyncio>=0.24.0",
+    "pytest-cov>=6.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["src/multi_agent_ops"]
+omit = ["tests/*"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.",
+    "raise NotImplementedError",
+]
